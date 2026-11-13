@@ -9,8 +9,9 @@
 1. 连接 MCP：`https://app.openseo.so/mcp`；或安装 OpenSEO 插件，一次拿到 MCP 工具和 skills。
 2. 验证：`whoami`、`list_projects`，确认已登录并能读到项目。
 3. 安装 skills：Claude Code / Codex 用插件；其他 agent 用 `npx skills add`（见 2.2）。
-4. 开工前：`get_project_context` + `list_reports`，复用已有研究。
-5. 选工作流：不确定时用 `seo-coach`，新项目用 `seo-project-setup`；任何付费操作先估算 credits 并确认。
+4. 连接 GSC 和 GA4：在 OpenSEO 的 **Settings → Integrations** 连接 Google 账号，并把 GSC 站点和 GA4 媒体资源绑定到项目（见 2.3）。
+5. 开工前：`get_project_context` + `list_reports`，复用已有研究。
+6. 选工作流：不确定时用 `seo-coach`，新项目用 `seo-project-setup`；任何付费操作先估算 credits 并确认。
 
 ## 1. OpenSEO 是什么
 
@@ -23,6 +24,8 @@ OpenSEO 是项目主要使用的 SEO 工具，由三部分组成：
 | Skills | 预置的完整工作流（`SKILL.md`） | agent 的“流程”：按固定步骤完成某类任务并产出报告 |
 
 MCP 只提供工具，不包含 skills；插件（plugin）会同时带上 MCP 工具和 skills。只连 MCP 时 agent 仍能用自然语言完成任务，但不会遵循 OpenSEO 的预置工作流。
+
+另外，OpenSEO 的完整能力依赖第一方数据：只有连接 Google Search Console（GSC）和 Google Analytics 4（GA4）后，才能读取站点真实的搜索表现、索引状态和转化数据。接入步骤见 2.3。
 
 ## 2. 一次性接入
 
@@ -85,7 +88,16 @@ npx skills add https://github.com/every-app/open-seo/tree/main/plugins/openseo/s
 
 Claude 网页版/桌面版的 connector 只有工具；需要 skills 时使用 Claude 付费计划的 OpenSEO 插件，或按官方文档把 skill 目录上传到 **Customize → Skills**。skills 的安装、检查和更新方式见 [Install OpenSEO skills](https://openseo.so/docs/skills/setup)。
 
-### 2.3 验证接入
+### 2.3 连接 GSC 和 GA4
+
+要充分发挥 OpenSEO 的能力，需要把项目的 Google Search Console（GSC）和 Google Analytics 4（GA4）连接上：在 OpenSEO 应用的 **Settings → Integrations** 中连接 Google 账号，再把 GSC 站点和 GA4 媒体资源绑定到项目。连接和授权在 OpenSEO 设置里完成；绑定后 agent 可以用 `list_search_console_sites` 等工具列出可见站点并绑定到项目（免费，不消耗 credits）。
+
+- **GSC**：提供点击、曝光、CTR、排名、索引状态和机会页等第一方搜索数据，是判断真实搜索表现、排查收录问题、发现“差一点上首页”页面的依据。
+- **GA4**：提供自然流量、落地页、转化、电商和渠道来源数据，用于判断 SEO 带来的实际业务结果，并给机会页排序。
+
+不连接 GSC / GA4 时，关键词研究、SERP、竞品、外链、审计等功能仍可使用，但涉及站点真实表现和转化的判断会缺少第一方数据，结论可信度有限。
+
+### 2.4 验证接入
 
 安装完成后先做免费检查，不要在这一步跑付费研究：
 
@@ -103,6 +115,7 @@ skill 的调用方式取决于安装方式：插件安装用 `/openseo:<skill>`�
 让 agent 先执行 `get_project_context` 和 `list_reports`，再开始新任务：
 
 - 确认项目、站点、目标市场 / 国家 / 语言和当前目标。
+- 确认项目已连接 GSC 和 GA4；未连接时先提醒用户补上，并在涉及真实表现或转化的结论中说明数据缺口。
 - 查看已有研究日志和报告，30 天内做过的同类研究直接复用，不要重复消耗 credits。
 - 任务缺少关键信息（站点、市场、要解决的问题）时先问清楚，不要猜。
 
